@@ -1,6 +1,5 @@
 
-1.  I initially got a Java Error JDK 21 or Latest). To resolve it I had to add the below Conf
-      .set("spark.driver.extraJavaOptions", "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED")
-      .set("spark.executor.extraJavaOptions", "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED")
+1.  I initially got a Java Error JDK 21 or Latest). To resolve it I had to add the below Conf in VM Options in Run Configurations
+    --add-exports=java.base/sun.nio.ch=ALL-UNNAMED
 
 Kindly mention the  JDK version to be used for this Project in the Readme.md
