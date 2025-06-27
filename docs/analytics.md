@@ -20,6 +20,7 @@ ORDER BY trip_count DESC
 LIMIT 5;
 ```
 Result:
+
 ![img.png](img.png)
 
 ### 🔍 Insight 2: Common Rate Codes Used for Airport Trips
@@ -38,6 +39,7 @@ ORDER BY trip_count DESC;
 
 ```
 Result:
+
 ![img_1.png](img_1.png)
 
 ### 🔍 Insight 3:Boroughs with the Slowest Average Speed
@@ -77,4 +79,30 @@ ORDER BY avg_total_amount DESC;
 ```
 
 Result:
+
 ![img_3.png](img_3.png)
+
+### 🔍 Traffic Regulation Query:
+
+```sql
+SELECT
+  l.borough,
+  l.zone,
+  EXTRACT(HOUR FROM t.tpep_dropoff_datetime) AS dropoff_hour,
+  COUNT(*) AS trip_count
+FROM
+  trips t
+JOIN
+  taxi_zones l
+ON
+  t.do_location_id = l.locationid
+GROUP BY
+  l.borough,
+  l.zone,
+  dropoff_hour
+ORDER BY
+  trip_count DESC
+```
+Result:
+
+![img_4.png](img_4.png)

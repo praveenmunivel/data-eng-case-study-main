@@ -43,66 +43,66 @@ object TaxiPipeline extends Logging {
       .getOrCreate()
 
     // TODO: this is just an example
-//    val exampleCols: Seq[String] = Seq(
-//      "trip_id",
-//      "VendorID",
-//      "tpep_pickup_datetime",
-//      "tpep_dropoff_datetime",
-//      "passenger_count",
-//      "fare_amount"
-//    )
+    val exampleCols: Seq[String] = Seq(
+      "trip_id",
+      "VendorID",
+      "tpep_pickup_datetime",
+      "tpep_dropoff_datetime",
+      "passenger_count",
+      "fare_amount"
+    )
 
-//    val df = spark
-//      .read
-//      .parquet("s3a://taxi-bucket/taxi-data/")
-//      .withColumn("trip_id", uuid().cast("string"))
-//      .select(exampleCols.map(col): _*)
-//      .limit(100)
-//
-//    // write the DataFrame to PostgreSQL
-//    df.write
-//      .mode("append")
-//      .jdbc(
-//        url = conf.jdbcUrl,
-//        table = "test_taxi_table",
-//        connectionProperties = conf.connectionProperties
-//      )
+    val df = spark
+      .read
+      .parquet("s3a://taxi-bucket/taxi-data/")
+      .withColumn("trip_id", uuid().cast("string"))
+      .select(exampleCols.map(col): _*)
+      .limit(100)
+
+    // write the DataFrame to PostgreSQL
+    df.write
+      .mode("append")
+      .jdbc(
+        url = conf.jdbcUrl,
+        table = "test_taxi_table",
+        connectionProperties = conf.connectionProperties
+      )
 
     // Lookup table write to lookup table taxi_zones
     import spark.implicits._
-//    val lookupMapping = Encoders.product[TaxiZoneLookup]
-//    val lookup_df = spark.read.format("csv").option("header", "true")
-//      .load("s3a://taxi-bucket/reference-data/")
-//      .withColumn("locationid", col("LocationID").cast("int"))
-//      .select(lookupMapping.schema.map(x => col(x.name)):_*)
-//      .as[TaxiZoneLookup](lookupMapping)
+    val lookupMapping = Encoders.product[TaxiZoneLookup]
+    val lookup_df = spark.read.format("csv").option("header", "true")
+      .load("s3a://taxi-bucket/reference-data/")
+      .withColumn("locationid", col("LocationID").cast("int"))
+      .select(lookupMapping.schema.map(x => col(x.name)):_*)
+      .as[TaxiZoneLookup](lookupMapping)
 
-//    lookup_df.write
-//          .mode("append")
-//          .jdbc(
-//            url = conf.jdbcUrl,
-//            table = "taxi_zones",
-//            connectionProperties = conf.connectionProperties
-//          )
+    lookup_df.write
+          .mode("append")
+          .jdbc(
+            url = conf.jdbcUrl,
+            table = "taxi_zones",
+            connectionProperties = conf.connectionProperties
+          )
 
-//    val tripsMapping = Encoders.product[Trip]
-//    val df = spark.read
-//          .parquet("s3a://taxi-bucket/taxi-data/")
-//          .withColumnRenamed("VendorID", "vendor_id")
-//          .withColumnRenamed("RatecodeID", "rate_code_id")
-//          .withColumnRenamed("PULocationID", "pu_location_id")
-//          .withColumnRenamed("DOLocationID", "do_location_id")
-//          .withColumnRenamed("payment_type", "payment_type_id")
-//          .withColumnRenamed("Airport_fee", "airport_fee")
-//          .select(tripsMapping.schema.map(x => col(x.name)):_*)
+    val tripsMapping = Encoders.product[Trip]
+    val final_df = spark.read
+          .parquet("s3a://taxi-bucket/taxi-data/")
+          .withColumnRenamed("VendorID", "vendor_id")
+          .withColumnRenamed("RatecodeID", "rate_code_id")
+          .withColumnRenamed("PULocationID", "pu_location_id")
+          .withColumnRenamed("DOLocationID", "do_location_id")
+          .withColumnRenamed("payment_type", "payment_type_id")
+          .withColumnRenamed("Airport_fee", "airport_fee")
+          .select(tripsMapping.schema.map(x => col(x.name)):_*)
 
-//    df.write
-//              .mode("append")
-//              .jdbc(
-//                url = conf.jdbcUrl,
-//                table = "trips",
-//                connectionProperties = conf.connectionProperties
-//              )
+    final_df.write
+              .mode("append")
+              .jdbc(
+                url = conf.jdbcUrl,
+                table = "trips",
+                connectionProperties = conf.connectionProperties
+              )
     val tripsDF = spark.read.jdbc(
       url = conf.jdbcUrl,
       table = "trips",
